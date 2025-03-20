@@ -50,6 +50,7 @@ public class SocketHandle {
     }
 
     public static class Client implements AutoCloseable {
+        String message = "";
         Socket socket;
 
         BufferedWriter writer;
@@ -73,7 +74,6 @@ public class SocketHandle {
                         InputStreamReader isr = new InputStreamReader(is);
                         BufferedReader reader = new BufferedReader(isr)
                 ) {
-                    String message;
                     while ((message = reader.readLine()) != null) {
                         Message.sendToMC(message, Formatting.GRAY);
                     }

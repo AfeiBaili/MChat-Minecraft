@@ -9,7 +9,9 @@ public class Listener {
 
     public static void load() {
         ServerMessageEvents.ALLOW_GAME_MESSAGE.register((server, message, overlay) -> {
-            Message.sendToGroup(message.getString());
+            if (!SocketHandle.client.message.equals(message.getString())) {
+                Message.sendToGroup(message.getString());
+            }
             return true;
         });
         ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((message, player, overlay) -> {
