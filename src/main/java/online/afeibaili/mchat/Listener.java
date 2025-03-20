@@ -10,7 +10,21 @@ public class Listener {
     public static void load() {
         ServerMessageEvents.ALLOW_GAME_MESSAGE.register((server, message, overlay) -> {
             if (!SocketHandle.client.message.equals(message.getString())) {
-                Message.sendToGroup(message.getString());
+                int len;
+                String player = message.getString().split(" ")[0];
+                if (message.getString().contains("has made the advancement") &&
+                        (len = message.getString().lastIndexOf("[")) != -1) {
+                    Message.sendToGroup(player + "取得了进度" + message.getString().substring(len));
+                    return true;
+                }
+                if (message.getString().contains("left the game")) {
+                    Message.sendToGroup(player + "退出了游戏");
+                    return true;
+                }
+                if (message.getString().contains("joined the game")) {
+                    Message.sendToGroup(player + "加入了游戏");
+                    return true;
+                }
             }
             return true;
         });

@@ -6,7 +6,7 @@ import net.minecraft.util.Formatting;
 
 public class Message {
     public static void sendToMC(String message, Formatting formatting) {
-        MutableText text = Text.literal(message).formatted(formatting).formatted(Formatting.BOLD);
+        MutableText text = Text.literal(message).formatted(formatting);
         Listener.server.getPlayerManager().broadcast(text, false);
     }
 
