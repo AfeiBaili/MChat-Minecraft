@@ -51,6 +51,7 @@ public class SocketHandle {
 
     public static class Client implements AutoCloseable {
         String message = "";
+        Formatting style = Formatting.GRAY;
         Socket socket;
 
         BufferedWriter writer;
@@ -75,7 +76,8 @@ public class SocketHandle {
                         BufferedReader reader = new BufferedReader(isr)
                 ) {
                     while ((message = reader.readLine()) != null) {
-                        Message.sendToMC(message, Formatting.GRAY);
+                        Commands.parsingMessage(message);
+                        Message.sendToMC(message, style);
                     }
                     LOGGER.info("服务器端开了连接！");
                 } catch (IOException e) {

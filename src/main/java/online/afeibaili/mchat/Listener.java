@@ -53,7 +53,7 @@ public class Listener {
         for (String name : server.getPlayerNames()) {
             stringBuilder.append(name).append("、");
         }
-        stringBuilder.delete(leg - 1, leg);
+        stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
         return stringBuilder.toString();
     }
 }
