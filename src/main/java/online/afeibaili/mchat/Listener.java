@@ -12,8 +12,7 @@ public class Listener {
             if (!SocketHandle.client.message.equals(message.getString())) {
                 int len;
                 String player = message.getString().split(" ")[0];
-                if (message.getString().contains("has made the advancement") &&
-                        (len = message.getString().lastIndexOf("[")) != -1) {
+                if (message.getString().contains("has made the advancement") && (len = message.getString().lastIndexOf("[")) != -1) {
                     Message.sendToGroup(player + "取得了进度" + message.getString().substring(len));
                     return true;
                 }
@@ -25,6 +24,11 @@ public class Listener {
                     Message.sendToGroup(player + "加入了游戏");
                     return true;
                 }
+                if (message.getString().contains("fell from a high place")) {
+                    Message.sendToGroup(player + "从高处摔了下来");
+                    return true;
+                }
+                Message.sendToGroup(message.getString());
             }
             return true;
         });
@@ -39,5 +43,17 @@ public class Listener {
         ServerWorldEvents.UNLOAD.register((server, world) -> {
             SocketHandle.unload();
         });
+    }
+
+    public static String getServerPlayers() {
+        StringBuilder stringBuilder = new StringBuilder();
+        int leg = server.getPlayerNames().length;
+        if (leg == 0) return "当前服务器没有玩家！";
+        stringBuilder.append("当前玩家").append(leg).append("人：");
+        for (String name : server.getPlayerNames()) {
+            stringBuilder.append(name).append("、");
+        }
+        stringBuilder.delete(leg - 1, leg);
+        return stringBuilder.toString();
     }
 }
