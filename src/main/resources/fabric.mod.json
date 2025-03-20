@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "mchat",
+  "version": "${version}",
+
+  "name": "MChat",
+  "description": "",
+  "authors": [],
+  "contact": {},
+
+  "license": "All-Rights-Reserved",
+  "icon": "assets/mchat/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": ["online.afeibaili.mchat.client.MchatClient"],
+    "main": [
+      "online.afeibaili.mchat.MChat"
+    ]
+  },
+
+
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
