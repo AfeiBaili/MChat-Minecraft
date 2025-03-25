@@ -12,28 +12,34 @@ public class Listener {
             if (!SocketHandle.client.message.equals(message.getString())) {
                 int len;
                 String player = message.getString().split(" ")[0];
-                if (message.getString().contains("has made the advancement") && (len = message.getString().lastIndexOf("[")) != -1) {
+                if (message.getString().contains("has made the advancement") &&
+                        (len = message.getString().lastIndexOf("[")) != -1 && Options.PRINT_ADVANCEMENT.value) {
                     Message.sendToGroup(player + "取得了进度" + message.getString().substring(len));
                     return true;
                 }
-                if (message.getString().contains("left the game")) {
+                if (message.getString().contains("left the game") && Options.PRINT_LEFT_GAME.value) {
                     Message.sendToGroup(player + "退出了游戏");
                     return true;
                 }
-                if (message.getString().contains("joined the game")) {
+                if (message.getString().contains("joined the game") && Options.PRINT_JOINED_GAME.value) {
                     Message.sendToGroup(player + "加入了游戏");
                     return true;
                 }
-                if (message.getString().contains("fell from a high place")) {
+                if (message.getString().contains("fell from a high place") && Options.PRINT_DEATH.value) {
                     Message.sendToGroup(player + "从高处摔了下来");
                     return true;
                 }
-                Message.sendToGroup(message.getString());
+                if (Options.PRINT_OTHER.value) {
+                    Message.sendToGroup(message.getString());
+
+                }
             }
             return true;
         });
         ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((message, player, overlay) -> {
-            Message.sendToGroup(player.getName().getString() + ": " + message.getContent().getString());
+            if (Options.PRINT_CHAT.value) {
+                Message.sendToGroup(player.getName().getString() + ": " + message.getContent().getString());
+            }
             return true;
         });
         ServerWorldEvents.LOAD.register((server, world) -> {
