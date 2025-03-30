@@ -4,6 +4,8 @@ import net.minecraft.util.Formatting;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static online.afeibaili.mchat.MChat.LOGGER;
 
@@ -61,11 +63,23 @@ public class SocketHandle {
                 this.socket = new Socket(host, port);
                 initReceiveMessage();
                 initSendMessage();
+                initHeartbeat();
 
                 LOGGER.info("服务器开启成功！");
             } catch (IOException e) {
                 LOGGER.info("连接到远程失败！");
             }
+        }
+
+        public void initHeartbeat() {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    send("");
+                }
+            }, 60000 * 5, 60000 * 5);
         }
 
         public void initReceiveMessage() {
