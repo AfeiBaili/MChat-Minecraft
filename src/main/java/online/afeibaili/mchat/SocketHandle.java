@@ -77,7 +77,7 @@ public class SocketHandle {
 
                 @Override
                 public void run() {
-                    send("");
+                    send("\n");
                 }
             }, 60000 * 5, 60000 * 5);
         }
