@@ -40,7 +40,7 @@ class SocketManager(val address: String, val port: Int, token: String) {
             heartbeatJob = Heartbeat({
                 send(HeartbeatMessage(""))
             }) { reconnect(RuntimeException("心跳异常")) }.job
-            reader = Reader(socket) { RuntimeException("读取器异常") }
+            reader = Reader(socket, cipher) { RuntimeException("读取器异常") }
             logger.info("连接成功")
             messageManager.sendMessageToMC("已连接至服务器。")
         }.onFailure { e ->
