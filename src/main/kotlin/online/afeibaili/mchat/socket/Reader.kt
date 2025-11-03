@@ -24,22 +24,20 @@ class Reader(val socket: Socket, cipher: Cipher, catch: () -> Unit) {
         val readerDispatcher: ExecutorCoroutineDispatcher =
             Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-        val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
         job = scope.launch(readerDispatcher) {
             runCatching {
+                val reader = BufferedReader(InputStreamReader(socket.getInputStream()))
                 reader.use { reader ->
                     while (isActive) {
-                        val readLine: String? = reader.readLine()
-                        if (readLine != null) {
-                            messageManager.parseMessage(cipher.decrypt(readLine))
-                        }
+                        val readLine: String = reader.readLine()
+                        messageManager.parseMessage(cipher.decrypt(readLine))
                     }
                 }
             }.onFailure { catch.invoke() }
         }
     }
 
-    fun close() = {
+    fun close() {
         job.cancel()
     }
 }
