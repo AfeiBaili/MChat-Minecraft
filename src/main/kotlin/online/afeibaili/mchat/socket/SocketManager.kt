@@ -81,7 +81,7 @@ class SocketManager(val address: String, val port: Int, token: String) {
     fun send(message: Message) {
         val encrypt: String = cipher.encrypt(message.toString())
         runCatching {
-            if (socket.isClosed) throw RuntimeException("套接字已断开连接")
+            if (socket.isClosed) throw RuntimeException("套接字已断开连接。")
             writer.println(encrypt)
         }.onFailure { e ->
             messageManager.sendMessageToMC("发送消息失败，正在重新连接。${e.message}")
