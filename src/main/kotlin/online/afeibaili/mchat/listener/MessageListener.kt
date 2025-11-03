@@ -21,7 +21,7 @@ class MessageListener {
         val message: Component = event.message
         val player: ServerPlayer = event.player
         messageManager.sendToGroup(
-            "${messageManager.server!!.name()}\n${player.name.string}: ${message.string}"
+            "${player.name.string}: ${message.string}"
         )
     }
 }

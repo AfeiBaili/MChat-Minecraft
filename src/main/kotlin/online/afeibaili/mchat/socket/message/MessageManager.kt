@@ -16,7 +16,9 @@ class MessageManager(var server: MinecraftServer?) {
     val messageStyle = ChatFormatting.GRAY
 
     fun sendToMC(message: String, formatting: ChatFormatting) {
-        server!!.sendSystemMessage(Component.literal(message).withStyle(formatting))
+        server!!.playerList.players.forEach { player ->
+            player.sendSystemMessage(Component.literal(message).withStyle(formatting))
+        }
     }
 
     fun sendMessageToMC(message: String, formatting: ChatFormatting = ChatFormatting.GRAY) {

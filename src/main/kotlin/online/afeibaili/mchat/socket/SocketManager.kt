@@ -12,6 +12,7 @@ import online.afeibaili.mchat.socket.message.Message
 import java.io.PrintWriter
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.nio.charset.StandardCharsets
 
 
 /**
@@ -35,7 +36,7 @@ class SocketManager(val address: String, val port: Int, token: String) {
     private fun connect() {
         runCatching {
             socket.connect(InetSocketAddress(address, port))
-            writer = PrintWriter(socket.getOutputStream(), true)
+            writer = PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8)
             //创建心跳
             heartbeatJob = Heartbeat({
                 send(HeartbeatMessage(""))
@@ -79,10 +80,12 @@ class SocketManager(val address: String, val port: Int, token: String) {
 
     fun send(message: Message) {
         val encrypt: String = cipher.encrypt(message.toString())
-        runCatching { writer.println(encrypt) }
-            .onFailure { e ->
-                messageManager.sendMessageToMC("发送消息失败，正在重新连接。")
-                reconnect(e)
-            }
+        runCatching {
+            if (socket.isClosed) throw RuntimeException("套接字已断开连接")
+            writer.println(encrypt)
+        }.onFailure { e ->
+            logger.error("发送消息失败，正在重新连接。${e.message}")
+            reconnect(e)
+        }
     }
 }
