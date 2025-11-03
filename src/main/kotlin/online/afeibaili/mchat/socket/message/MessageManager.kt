@@ -29,6 +29,10 @@ class MessageManager(var server: MinecraftServer?) {
         MChat.socketManager.send(TextMessage(message))
     }
 
+    fun sendHeartbeatToGroup() {
+        MChat.socketManager.send(HeartbeatMessage(""))
+    }
+
 
     fun parseMessage(message: String) {
         val ident: String = message.take(4)

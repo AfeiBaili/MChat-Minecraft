@@ -48,6 +48,7 @@ object MChat {
     @SubscribeEvent
     fun onServerSetup(event: ServerStartingEvent) {
         messageManager.server = event.server
+        messageManager.sendHeartbeatToGroup()
         logger.info("MChat已启动")
     }
 }
