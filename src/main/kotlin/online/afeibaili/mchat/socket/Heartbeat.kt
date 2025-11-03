@@ -13,15 +13,15 @@ import online.afeibaili.mchat.MChat
  *@version 2025/11/3 18:46
  */
 
-class Heartbeat(action: () -> Unit, catch: () -> Unit = {}) {
+class Heartbeat(action: () -> Unit, catch: (e: Throwable) -> Unit = {}) {
     val job: Job = MChat.scope.launch {
         runCatching {
             while (isActive) {
                 action.invoke()
                 delay(60000 * 5)
             }
-        }.onFailure {
-            catch.invoke()
+        }.onFailure { exception ->
+            catch.invoke(exception)
         }
     }
 }
