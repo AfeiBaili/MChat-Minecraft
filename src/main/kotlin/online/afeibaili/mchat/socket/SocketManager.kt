@@ -63,8 +63,8 @@ class SocketManager(val address: String, val port: Int, token: String) {
         runCatching {
             reconnectJob?.cancel()
             reconnectJob = scope.launch {
-                logger.error("连接至服务器失败：\"${e.message}\"，60秒后进行重连...")
-                delay(60000)
+                logger.error("连接至服务器失败：\"${e.message}\"，10秒后进行重连...")
+                delay(10000)
                 if (::heartbeatJob.isInitialized)
                     heartbeatJob.cancel()
                 if (::writer.isInitialized)
