@@ -13,15 +13,34 @@ import online.afeibaili.mchat.MChat
  */
 
 class MessageManager(var server: MinecraftServer?) {
+    val messageStyle = ChatFormatting.GRAY
+
     fun sendToMC(message: String, formatting: ChatFormatting) {
         server!!.sendSystemMessage(Component.literal(message).withStyle(formatting))
     }
 
     fun sendMessageToMC(message: String, formatting: ChatFormatting = ChatFormatting.GRAY) {
-        server!!.sendSystemMessage(Component.literal(message).withStyle(formatting))
+        sendToMC(message, formatting)
     }
 
     fun sendToGroup(message: String) {
         MChat.socketManager.send(TextMessage(message))
+    }
+
+
+    fun parseMessage(message: String) {
+        val ident: String = message.take(4)
+        val message: String = message.drop(4)
+        val msg: Message? = match(ident, message)
+    }
+
+    fun match(ident: String, message: String) = when (ident) {
+        "txt:" -> TextMessage(message).apply {
+            sendToMC(this.message, messageStyle)
+        }
+
+        "cmd:" -> CommandMessage(message)
+        "het:" -> HeartbeatMessage(message)
+        else -> null
     }
 }

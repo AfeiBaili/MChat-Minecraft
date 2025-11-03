@@ -1,7 +1,6 @@
 package online.afeibaili.mchat.socket
 
 import kotlinx.coroutines.*
-import net.minecraft.ChatFormatting
 import online.afeibaili.mchat.MChat.messageManager
 import online.afeibaili.mchat.MChat.scope
 import java.io.BufferedReader
@@ -19,7 +18,6 @@ import java.util.concurrent.Executors
 
 class Reader(val socket: Socket, catch: () -> Unit) {
     val job: Job
-    val messageStyle = ChatFormatting.GRAY
 
     init {
         val readerDispatcher: ExecutorCoroutineDispatcher =
@@ -32,7 +30,7 @@ class Reader(val socket: Socket, catch: () -> Unit) {
                     while (isActive) {
                         val readLine: String? = reader.readLine()
                         if (readLine != null) {
-                            messageManager.sendToMC(readLine, messageStyle)
+                            messageManager.parseMessage(readLine)
                         }
                     }
                 }
