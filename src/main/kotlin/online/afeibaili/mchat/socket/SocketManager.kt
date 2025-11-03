@@ -84,7 +84,7 @@ class SocketManager(val address: String, val port: Int, token: String) {
             if (socket.isClosed) throw RuntimeException("套接字已断开连接")
             writer.println(encrypt)
         }.onFailure { e ->
-            logger.error("发送消息失败，正在重新连接。${e.message}")
+            messageManager.sendMessageToMC("发送消息失败，正在重新连接。${e.message}")
             reconnect(e)
         }
     }
