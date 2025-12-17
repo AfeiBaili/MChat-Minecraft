@@ -1,8 +1,7 @@
 package online.afeibaili.mchat.socket
 
 import kotlinx.coroutines.*
-import online.afeibaili.mchat.MChat.messageManager
-import online.afeibaili.mchat.MChat.scope
+import online.afeibaili.mchat.MChatSystem
 import online.afeibaili.mchat.socket.cipher.Cipher
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -25,13 +24,13 @@ class Reader(val socket: Socket, cipher: Cipher, catch: () -> Unit) {
         val readerDispatcher: ExecutorCoroutineDispatcher =
             Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
-        job = scope.launch(readerDispatcher) {
+        job = MChatSystem.system.scope.launch(readerDispatcher) {
             runCatching {
                 val reader = BufferedReader(InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))
                 reader.use { reader ->
                     while (isActive) {
                         val readLine: String = reader.readLine()
-                        messageManager.parseMessage(cipher.decrypt(readLine))
+                        MChatSystem.system.messageManager.parseMessage(cipher.decrypt(readLine))
                     }
                 }
             }.onFailure { catch.invoke() }

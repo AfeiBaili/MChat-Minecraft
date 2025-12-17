@@ -3,9 +3,7 @@ package online.afeibaili.mchat.socket
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import online.afeibaili.mchat.MChat.logger
-import online.afeibaili.mchat.MChat.messageManager
-import online.afeibaili.mchat.MChat.scope
+import online.afeibaili.mchat.MChatSystem
 import online.afeibaili.mchat.socket.cipher.Cipher
 import online.afeibaili.mchat.socket.message.HeartbeatMessage
 import online.afeibaili.mchat.socket.message.Message
@@ -42,9 +40,10 @@ class SocketManager(val address: String, val port: Int, token: String) {
                 send(HeartbeatMessage(""))
             }).job
             reader = Reader(socket, cipher) { RuntimeException("读取器异常") }
-            logger.info("连接成功")
-            messageManager.sendMessageToMC("已连接至服务器。")
+            MChatSystem.system.logger.info("连接成功")
+            MChatSystem.system.messageManager.sendMessageToMC("已连接至服务器。")
         }.onFailure { e ->
+            e.printStackTrace()
             reconnect(RuntimeException("无法连接服务器"))
         }
     }
@@ -62,8 +61,8 @@ class SocketManager(val address: String, val port: Int, token: String) {
     fun reconnect(e: Throwable) {
         runCatching {
             reconnectJob?.cancel()
-            reconnectJob = scope.launch {
-                logger.error("连接至服务器失败：\"${e.message}\"，10秒后进行重连...")
+            reconnectJob = MChatSystem.system.scope.launch {
+                MChatSystem.system.logger.error("连接至服务器失败：\"${e.message}\"，10秒后进行重连...")
                 delay(10000)
                 if (::heartbeatJob.isInitialized)
                     heartbeatJob.cancel()
@@ -84,7 +83,7 @@ class SocketManager(val address: String, val port: Int, token: String) {
             if (socket.isClosed) throw RuntimeException("套接字已断开连接。")
             writer.println(encrypt)
         }.onFailure { e ->
-            messageManager.sendMessageToMC("发送消息失败，正在重新连接。${e.message}")
+            MChatSystem.system.messageManager.sendMessageToMC("发送消息失败，正在重新连接。${e.message}")
             reconnect(e)
         }
     }
