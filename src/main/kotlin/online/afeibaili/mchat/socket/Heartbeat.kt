@@ -4,7 +4,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import online.afeibaili.mchat.MChatSystem
+import online.afeibaili.mchat.MChat
 
 /**
  * 心跳类
@@ -14,11 +14,11 @@ import online.afeibaili.mchat.MChatSystem
  */
 
 class Heartbeat(action: () -> Unit, catch: (e: Throwable) -> Unit = {}) {
-    val job: Job = MChatSystem.system.scope.launch {
+    val job: Job = MChat.scope.launch {
         runCatching {
             while (isActive) {
                 action.invoke()
-                delay(60000 * 5)
+                delay(60000 * 3)
             }
         }.onFailure { exception ->
             catch.invoke(exception)

@@ -3,7 +3,7 @@ package online.afeibaili.mchat.socket.message
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
-import online.afeibaili.mchat.MChatSystem
+import online.afeibaili.mchat.MChat
 
 /**
  * 消息管理器
@@ -26,11 +26,11 @@ class MessageManager(var server: MinecraftServer?) {
     }
 
     fun sendToGroup(message: String) {
-        MChatSystem.system.socketManager.send(TextMessage(message))
+        MChat.socketManager.send(TextMessage(message))
     }
 
     fun sendHeartbeatToGroup() {
-        MChatSystem.system.socketManager.send(HeartbeatMessage(""))
+        MChat.socketManager.send(HeartbeatMessage(""))
     }
 
 
