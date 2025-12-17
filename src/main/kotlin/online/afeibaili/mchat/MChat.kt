@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger
  */
 @Mod(MChat.ID)
 object MChat {
+    //需要更新组件化
     const val ID = "mchat"
 
     val scope = CoroutineScope(Dispatchers.IO)
