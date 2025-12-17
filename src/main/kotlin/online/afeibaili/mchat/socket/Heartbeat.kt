@@ -18,7 +18,7 @@ class Heartbeat(action: () -> Unit, catch: (e: Throwable) -> Unit = {}) {
         runCatching {
             while (isActive) {
                 action.invoke()
-                delay(60000 * 3)
+                delay(60000 * 5)
             }
         }.onFailure { exception ->
             catch.invoke(exception)
