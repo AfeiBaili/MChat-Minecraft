@@ -11,6 +11,7 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent
 import online.afeibaili.mchat.MChat.mchatSystem
 import online.afeibaili.mchat.config.Config
 import online.afeibaili.mchat.listener.MessageListener
+import online.afeibaili.mchat.logger.Logger
 import online.afeibaili.mchat.socket.message.MessageManager
 import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 
@@ -22,6 +23,8 @@ object MChat {
         FORGE_BUS.register(this)
         FORGE_BUS.register(NMessageListener())
     }
+
+    val logger = Logger.getLogger("MChat")
 
     lateinit var mchatSystem: MChatSystem
 
@@ -41,6 +44,7 @@ object MChat {
     @SubscribeEvent
     fun onCommonSetup(event: ServerStoppingEvent) {
         if (::mchatSystem.isInitialized) {
+            logger.info("关闭MChatSystem")
             MChatSystem.close()
         }
     }
