@@ -1,69 +1,54 @@
 package online.afeibaili.mchat
 
-import online.afeibaili.mchat.block.ModBlocks
-import net.minecraft.client.Minecraft
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
 import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
-import net.neoforged.fml.event.lifecycle.FMLDedicatedServerSetupEvent
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.Logger
-import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
-import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
+import net.neoforged.neoforge.event.ServerChatEvent
+import net.neoforged.neoforge.event.server.ServerStartingEvent
+import net.neoforged.neoforge.event.server.ServerStoppingEvent
+import online.afeibaili.mchat.MChat.mchatSystem
+import online.afeibaili.mchat.config.Config
+import online.afeibaili.mchat.listener.MessageListener
+import online.afeibaili.mchat.socket.message.MessageManager
+import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 
-/**
- * Main mod class.
- *
- * An example for blocks is in the `blocks` package of this mod.
- */
 @Mod(MChat.ID)
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 object MChat {
     const val ID = "mchat"
 
-    // the logger for our mod
-    val LOGGER: Logger = LogManager.getLogger(ID)
-
     init {
-        LOGGER.log(Level.INFO, "Hello world!")
-
-        // Register the KDeferredRegister to the mod-specific event bus
-        ModBlocks.REGISTRY.register(MOD_BUS)
-
-        val obj = runForDist(
-            clientTarget = {
-                MOD_BUS.addListener(::onClientSetup)
-                Minecraft.getInstance()
-            },
-            serverTarget = {
-                MOD_BUS.addListener(::onServerSetup)
-                "test"
-            })
-
-        println(obj)
+        FORGE_BUS.register(this)
+        FORGE_BUS.register(NMessageListener())
     }
 
-    /**
-     * This is used for initializing client specific
-     * things such as renderers and keymaps
-     * Fired on the mod specific event bus.
-     */
-    private fun onClientSetup(event: FMLClientSetupEvent) {
-        LOGGER.log(Level.INFO, "Initializing client...")
-    }
+    lateinit var mchatSystem: MChatSystem
 
-    /**
-     * Fired on the global Forge bus.
-     */
-    private fun onServerSetup(event: FMLDedicatedServerSetupEvent) {
-        LOGGER.log(Level.INFO, "Server starting...")
+    @SubscribeEvent
+    fun onCommonSetup(event: ServerStartingEvent) {
+        mchatSystem = MChatSystem(Config("c5c5d6ce-", "u", 33393))
+        mchatSystem.messageManager = object : MessageManager<ChatFormatting, MinecraftServer>() {
+            override var formatting: ChatFormatting = ChatFormatting.GRAY
+            override fun sendToMC(message: String, formatting: ChatFormatting) {
+                event.server.playerList.players.forEach { player ->
+                    player.sendSystemMessage(Component.literal(message).withStyle(formatting))
+                }
+            }
+        }
     }
 
     @SubscribeEvent
-    fun onCommonSetup(event: FMLCommonSetupEvent) {
-        LOGGER.log(Level.INFO, "Hello! This is working!")
+    fun onCommonSetup(event: ServerStoppingEvent) {
+        if (::mchatSystem.isInitialized) {
+            MChatSystem.close()
+        }
+    }
+}
+
+class NMessageListener : MessageListener<ServerChatEvent> {
+    @SubscribeEvent
+    override fun onMessage(event: ServerChatEvent) {
+        mchatSystem.messageManager.sendToGroup(event.player.name.string + ": " + event.message.string)
     }
 }

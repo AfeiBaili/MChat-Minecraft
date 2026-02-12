@@ -18,16 +18,16 @@ import online.afeibaili.mchat.socket.message.MessageManager
 
 
 class MChatSystem(
-    val config: Config,
-    val socketManager: SocketManager = SocketManager(config.address, config.port, config.token),
-    val logger: Logger = Logger.getLogger("MChatSystem"),
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
+    config: Config,
 ) {
-    lateinit var messageManager: MessageManager<*, *>
-
     init {
         INSTANCE = this
     }
+
+    val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
+    val logger: Logger = Logger.getLogger("MChatSystem")
+    val socketManager: SocketManager = SocketManager(config.address, config.port, config.token)
+    lateinit var messageManager: MessageManager<*, *>
 
     companion object {
         lateinit var INSTANCE: MChatSystem
