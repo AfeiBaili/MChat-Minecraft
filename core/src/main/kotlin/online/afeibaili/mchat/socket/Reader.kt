@@ -39,7 +39,7 @@ class Reader(
     }
 
     override fun close() {
-        scope.cancel()
         reader.close()
+        scope.cancel()
     }
 }

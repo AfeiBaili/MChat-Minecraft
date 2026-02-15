@@ -62,11 +62,11 @@ open class SocketManager : Closeable {
     }
 
     override fun close() {
-        if (!isConnectable) return
+        if (isConnectable) return
+        socket.close()
         reader.close()
         writer.close()
         heartbeat.close()
-        socket.close()
         logger.info("已关闭MChatSystem")
     }
 
