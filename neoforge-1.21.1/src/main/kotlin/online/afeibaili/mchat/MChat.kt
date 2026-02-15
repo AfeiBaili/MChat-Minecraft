@@ -6,12 +6,12 @@ import net.minecraft.server.MinecraftServer
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.event.ServerChatEvent
+import net.neoforged.neoforge.event.entity.player.PlayerEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.event.server.ServerStoppingEvent
 import online.afeibaili.mchat.MChat.mchatSystem
 import online.afeibaili.mchat.config.Config
 import online.afeibaili.mchat.listener.MessageListener
-import online.afeibaili.mchat.logger.Logger
 import online.afeibaili.mchat.socket.message.MessageManager
 import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 
@@ -21,38 +21,42 @@ object MChat {
 
     init {
         FORGE_BUS.register(this)
-        FORGE_BUS.register(NMessageListener())
+        FORGE_BUS.register(Listener())
     }
 
-    val logger = Logger.getLogger("MChat")
-
-    lateinit var mchatSystem: MChatSystem
+    val mchatSystem: MChatSystem = MChatSystem()
 
     @SubscribeEvent
     fun onCommonSetup(event: ServerStartingEvent) {
-        mchatSystem = MChatSystem(Config("c5c5d6ce-", "u", 33393))
-        mchatSystem.messageManager = object : MessageManager<ChatFormatting, MinecraftServer>() {
-            override var formatting: ChatFormatting = ChatFormatting.GRAY
-            override fun sendToMC(message: String, formatting: ChatFormatting) {
-                event.server.playerList.players.forEach { player ->
-                    player.sendSystemMessage(Component.literal(message).withStyle(formatting))
+        val manager: MessageManager<ChatFormatting, MinecraftServer> =
+            object : MessageManager<ChatFormatting, MinecraftServer>() {
+                override var formatting: ChatFormatting = ChatFormatting.GRAY
+                override fun sendToMC(message: String, formatting: ChatFormatting) {
+                    event.server.playerList.players.forEach { player ->
+                        player.sendSystemMessage(Component.literal(message).withStyle(formatting))
+                    }
                 }
             }
-        }
+
+
+        mchatSystem.buildManager(manager)
+        mchatSystem.connect(Config("c5c5d6ce-", "u", 33393))
     }
 
     @SubscribeEvent
     fun onCommonSetup(event: ServerStoppingEvent) {
-        if (::mchatSystem.isInitialized) {
-            logger.info("关闭MChatSystem")
-            MChatSystem.close()
-        }
+        MChatSystem.close()
     }
 }
 
-class NMessageListener : MessageListener<ServerChatEvent> {
+class Listener : MessageListener<ServerChatEvent, PlayerEvent.PlayerLoggedInEvent> {
     @SubscribeEvent
     override fun onMessage(event: ServerChatEvent) {
-        mchatSystem.messageManager.sendToGroup(event.player.name.string + ": " + event.message.string)
+        mchatSystem.getMessageManager().sendToGroup(event.player.name.string + ": " + event.message.string)
+    }
+
+    @SubscribeEvent
+    override fun onPlayerIn(event: PlayerEvent.PlayerLoggedInEvent) {
+
     }
 }

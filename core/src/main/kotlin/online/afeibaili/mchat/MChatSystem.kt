@@ -1,10 +1,5 @@
 package online.afeibaili.mchat
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import online.afeibaili.mchat.config.Config
-import online.afeibaili.mchat.logger.Logger
 import online.afeibaili.mchat.socket.SocketManager
 import online.afeibaili.mchat.socket.message.MessageManager
 
@@ -17,33 +12,26 @@ import online.afeibaili.mchat.socket.message.MessageManager
  */
 
 
-class MChatSystem(
-    config: Config,
-) {
+class MChatSystem() : SocketManager() {
+    private lateinit var message: MessageManager<*, *>
+
     init {
         INSTANCE = this
     }
 
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
-    val logger: Logger = Logger.getLogger("MChatSystem")
-    val socketManager: SocketManager = SocketManager(config.address, config.port, config.token)
-    lateinit var messageManager: MessageManager<*, *>
+    fun buildManager(messageManager: MessageManager<*, *>) {
+        message = messageManager
+    }
+
+    fun getMessageManager(): MessageManager<*, *> {
+        return message
+    }
 
     companion object {
         lateinit var INSTANCE: MChatSystem
 
-        init {
-            Runtime.getRuntime().addShutdownHook(
-                Thread({
-                    close()
-                }, "Shutdown")
-            )
-        }
-
         fun close() {
-            INSTANCE.scope.cancel()
-            INSTANCE.socketManager.disconnect()
-            INSTANCE.logger.info("已断开MChat连接")
+            INSTANCE.close()
         }
     }
 }

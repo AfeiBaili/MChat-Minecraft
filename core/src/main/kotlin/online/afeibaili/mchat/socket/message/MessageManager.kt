@@ -9,7 +9,7 @@ import online.afeibaili.mchat.MChatSystem.Companion.INSTANCE
  *@author AfeiBaili
  *@version 2025/11/3 16:03
  */
-abstract class MessageManager<Formatting, Server>(var server: Server? = null) {
+abstract class MessageManager<Formatting, Server>() {
     abstract var formatting: Formatting
 
     abstract fun sendToMC(message: String, formatting: Formatting)
@@ -19,11 +19,11 @@ abstract class MessageManager<Formatting, Server>(var server: Server? = null) {
     }
 
     fun sendToGroup(message: String) {
-        INSTANCE.socketManager.send(MessageType.Text(message))
+        INSTANCE.send(MessageType.Text(message))
     }
 
     fun sendHeartbeat() {
-        INSTANCE.socketManager.send(MessageType.Heartbeat(""))
+        INSTANCE.send(MessageType.Heartbeat(""))
     }
 
     fun parseMessage(message: String) {

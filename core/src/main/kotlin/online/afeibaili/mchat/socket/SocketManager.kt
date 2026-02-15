@@ -1,15 +1,13 @@
 package online.afeibaili.mchat.socket
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import online.afeibaili.mchat.MChatSystem.Companion.INSTANCE
+import online.afeibaili.mchat.config.Config
+import online.afeibaili.mchat.logger.Logger
 import online.afeibaili.mchat.socket.cipher.CipherProcessor
 import online.afeibaili.mchat.socket.message.MessageType
-import java.io.PrintWriter
-import java.net.InetSocketAddress
+import java.io.Closeable
 import java.net.Socket
-import java.nio.charset.StandardCharsets
 
 
 /**
@@ -19,70 +17,60 @@ import java.nio.charset.StandardCharsets
  *@version 2025/11/3 16:00
  */
 
-class SocketManager(val address: String, val port: Int, token: String) {
-    var socket = Socket()
-    lateinit var writer: PrintWriter
-    lateinit var heartbeatJob: Job
+open class SocketManager : Closeable {
+    lateinit var socket: Socket
+    lateinit var writer: Writer
     lateinit var reader: Reader
-    val cipher = CipherProcessor(token)
-
-    init {
-        connect()
-    }
-
-    private fun connect() {
-        runCatching {
-            socket.connect(InetSocketAddress(address, port))
-            writer = PrintWriter(socket.getOutputStream(), true, StandardCharsets.UTF_8)
-            //创建心跳
-            heartbeatJob = Heartbeat({
-                send(MessageType.Heartbeat(""))
-            }).job
-            reader = Reader(socket, cipher) { RuntimeException("读取器异常") }
-            INSTANCE.logger.info("连接成功")
-            INSTANCE.messageManager.sendFormattingMessageToMC("已连接至服务器。")
-        }.onFailure { e ->
-            reconnect(RuntimeException("无法连接服务器"))
-        }
-    }
-
-    fun disconnect() {
-        runCatching {
-            heartbeatJob.cancel()
-            writer.close()
-            socket.close()
-            reader.close()
-        }
-    }
-
+    lateinit var cipher: CipherProcessor
+    lateinit var heartbeat: Heartbeat
+    val reconnectScope = CoroutineScope(Dispatchers.IO)
     var reconnectJob: Job? = null
-    fun reconnect(e: Throwable) {
+    var isConnectable = true
+
+    private val logger = Logger.getLogger("SocketManager")
+
+    fun connect(config: Config) = if (isConnectable) {
+        isConnectable = false
+        cipher = CipherProcessor(config.token)
         runCatching {
-            reconnectJob?.cancel()
-            reconnectJob = INSTANCE.scope.launch {
-                INSTANCE.logger.error("连接至服务器失败：\"${e.message}\"，10秒后进行重连...")
-                delay(10000)
-                if (::heartbeatJob.isInitialized)
-                    heartbeatJob.cancel()
-                if (::writer.isInitialized)
-                    writer.close()
-                socket.close()
-                socket = Socket()
-                if (::reader.isInitialized)
-                    reader.close()
-                connect()
+            socket = Socket(config.address, config.port)
+            writer = Writer(socket, cipher)
+            reader = Reader(socket, cipher, { message ->
+                INSTANCE.getMessageManager().sendFormattingMessageToMC(message)
+            }) { reconnect(config, "远程断开连接") }
+            heartbeat = Heartbeat({ INSTANCE.getMessageManager().sendHeartbeat() })
+            logger.info("已连接MChat服务器")
+        }.onFailure { e ->
+            reconnect(config, "无法连接")
+        }
+    } else {
+        reconnect(config, "不是首次连接")
+    }
+
+    fun reconnect(config: Config, errorMessage: String) {
+        reconnectJob?.cancel()
+        reconnectJob = reconnectScope.launch {
+            logger.error("连接至服务器失败：\"${errorMessage}\"，10秒后进行重连...")
+            delay(10000)
+            runCatching {
+                close()
+                yield()
+                isConnectable = true
+                connect(config)
             }
         }
     }
 
+    override fun close() {
+        if (!isConnectable) return
+        reader.close()
+        writer.close()
+        heartbeat.close()
+        socket.close()
+        logger.info("已关闭MChatSystem")
+    }
+
     fun send(message: MessageType) {
-        val encrypt: String = cipher.encrypt(message.toString())
-        runCatching {
-            if (socket.isClosed) throw RuntimeException("套接字已断开连接。")
-            writer.println(encrypt)
-        }.onFailure { e ->
-            INSTANCE.messageManager.sendFormattingMessageToMC("发送消息失败，正在重新连接。${e.message}")
-            reconnect(e)
-        }
+        writer.write(message)
     }
 }

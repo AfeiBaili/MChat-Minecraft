@@ -1,14 +1,12 @@
 package online.afeibaili.mchat.socket
 
-import kotlinx.coroutines.*
-import online.afeibaili.mchat.MChatSystem.Companion.INSTANCE
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import online.afeibaili.mchat.socket.cipher.CipherProcessor
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.Closeable
 import java.net.Socket
-import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executors
-
 
 /**
  * 读取器
@@ -17,27 +15,31 @@ import java.util.concurrent.Executors
  *@version 2025/11/3 19:11
  */
 
-class Reader(val socket: Socket, cipher: CipherProcessor, catch: () -> Unit) {
-    val job: Job
+class Reader(
+    socket: Socket,
+    val cipher: CipherProcessor,
+    val action: (String) -> Unit,
+    val catch: (Throwable) -> Unit,
+) :
+    Closeable {
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val reader = socket.inputStream.bufferedReader()
 
     init {
-        val readerDispatcher: ExecutorCoroutineDispatcher =
-            Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
-        job = INSTANCE.scope.launch(readerDispatcher) {
+        scope.launch {
             runCatching {
-                val reader = BufferedReader(InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))
-                reader.use { reader ->
-                    while (isActive) {
-                        val readLine: String = reader.readLine()
-                        INSTANCE.messageManager.parseMessage(cipher.decrypt(readLine))
-                    }
+                var line: String
+                while (reader.readLine().also { line = it } != null) {
+                    action(cipher.decrypt(line))
                 }
-            }.onFailure { catch.invoke() }
+            }.onFailure { exception ->
+                catch(exception)
+            }
         }
     }
 
-    fun close() {
-        job.cancel()
+    override fun close() {
+        scope.cancel()
+        reader.close()
     }
 }

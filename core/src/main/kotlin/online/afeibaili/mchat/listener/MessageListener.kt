@@ -8,6 +8,7 @@ package online.afeibaili.mchat.listener
  *@version 2025/11/3 13:51
  */
 
-interface MessageListener<Event> {
-    fun onMessage(event: Event)
+interface MessageListener<MessageEvent, PlayerIn> {
+    fun onMessage(event: MessageEvent)
+    fun onPlayerIn(event: PlayerIn)
 }
