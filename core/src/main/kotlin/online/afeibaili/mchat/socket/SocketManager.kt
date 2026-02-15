@@ -37,20 +37,20 @@ open class SocketManager : Closeable {
             writer = Writer(socket, cipher)
             reader = Reader(socket, cipher, { message ->
                 INSTANCE.getMessageManager().sendFormattingMessageToMC(message)
-            }) { reconnect(config, "远程断开连接") }
+            }) { logger.info("Disconnect remotely") }
             heartbeat = Heartbeat({ INSTANCE.getMessageManager().sendHeartbeat() })
-            logger.info("已连接MChat服务器")
+            logger.info("MChat server is connected")
         }.onFailure { e ->
-            reconnect(config, "无法连接")
+            reconnect(config, "Unable to connect")
         }
     } else {
-        reconnect(config, "不是首次连接")
+        reconnect(config, "Not the first connection")
     }
 
     fun reconnect(config: Config, errorMessage: String) {
         reconnectJob?.cancel()
         reconnectJob = reconnectScope.launch {
-            logger.error("连接至服务器失败：\"${errorMessage}\"，10秒后进行重连...")
+            logger.error("Failed to connect to the server:\"${errorMessage}\", Reconnect after 10 seconds...")
             delay(10000)
             runCatching {
                 close()
@@ -67,7 +67,8 @@ open class SocketManager : Closeable {
         reader.close()
         writer.close()
         heartbeat.close()
-        logger.info("已关闭MChatSystem")
+        logger.info("MChatSystem Closed")
+        isConnectable = true
     }
 
     fun send(message: MessageType) {
