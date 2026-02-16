@@ -36,7 +36,7 @@ open class SocketManager : Closeable {
             socket = Socket(config.address, config.port)
             writer = Writer(socket, cipher)
             reader = Reader(socket, cipher, { message ->
-                INSTANCE.getMessageManager().sendFormattingMessageToMC(message)
+                INSTANCE.getMessageManager().parseMessage(message)
             }) { logger.info("Disconnect remotely") }
             heartbeat = Heartbeat({ INSTANCE.getMessageManager().sendHeartbeat() })
             logger.info("MChat server is connected")
