@@ -63,15 +63,17 @@ open class SocketManager : Closeable {
 
     override fun close() {
         if (isConnectable) return
-        socket.close()
-        reader.close()
-        writer.close()
-        heartbeat.close()
+        if (::socket.isInitialized) socket.close()
+        if (::reader.isInitialized) reader.close()
+        if (::writer.isInitialized) writer.close()
+        if (::heartbeat.isInitialized) reader.close()
         logger.info("MChatSystem Closed")
         isConnectable = true
     }
 
     fun send(message: MessageType) {
-        writer.write(message)
+        if (::socket.isInitialized && socket.isConnected) {
+            writer.write(message)
+        }
     }
 }

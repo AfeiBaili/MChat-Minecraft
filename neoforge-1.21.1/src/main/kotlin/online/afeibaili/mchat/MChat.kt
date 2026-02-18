@@ -40,7 +40,7 @@ object MChat {
 
 
         mchatSystem.buildManager(manager)
-        mchatSystem.connect(Config("c5c5d6ce-", "u", 33393))
+        mchatSystem.connect(Config("c5c5d6ce-", "ua", 33393))
     }
 
     @SubscribeEvent
