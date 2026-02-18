@@ -1,5 +1,5 @@
 group = "online.afeibaili.an"
-version = "3.0.1"
+version = "v3"
 
 
 subprojects {
