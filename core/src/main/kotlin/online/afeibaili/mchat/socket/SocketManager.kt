@@ -41,6 +41,7 @@ open class SocketManager : Closeable {
             heartbeat = Heartbeat({ INSTANCE.getMessageManager().sendHeartbeat() })
             logger.info("MChat server is connected")
         }.onFailure { e ->
+            e.printStackTrace()
             reconnect(config, "Unable to connect")
         }
     } else {
