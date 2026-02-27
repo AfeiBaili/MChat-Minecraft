@@ -20,8 +20,7 @@ class Reader(
     val cipher: CipherProcessor,
     val action: (String) -> Unit,
     val catch: (Throwable) -> Unit,
-) :
-    Closeable {
+) : Closeable {
     private val scope = CoroutineScope(Dispatchers.IO)
     private val reader = socket.inputStream.bufferedReader()
 
@@ -32,7 +31,9 @@ class Reader(
                 while (reader.readLine().also { line = it } != null) {
                     action(cipher.decrypt(line))
                 }
+                throw RuntimeException("mchat server disconnect")
             }.onFailure { exception ->
+                exception.printStackTrace()
                 catch(exception)
             }
         }
