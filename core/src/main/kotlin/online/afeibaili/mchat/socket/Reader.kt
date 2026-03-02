@@ -31,7 +31,7 @@ class Reader(
                 while (reader.readLine().also { line = it } != null) {
                     action(cipher.decrypt(line))
                 }
-                throw RuntimeException("Mchat server disconnect")
+                throw RuntimeException("MChat server disconnect")
             }.onFailure { exception ->
                 exception.printStackTrace()
                 catch(exception)
