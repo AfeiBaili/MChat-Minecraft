@@ -50,7 +50,7 @@ object MChat {
     }
 
     @SubscribeEvent
-    fun onCommonSetup(event: ServerStoppingEvent) {
+    fun onCommonStop(event: ServerStoppingEvent) {
         MChatSystem.close()
     }
 }
