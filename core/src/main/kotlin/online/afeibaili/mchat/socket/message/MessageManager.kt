@@ -11,8 +11,8 @@ import online.afeibaili.mchat.MChatSystem.Companion.INSTANCE
  */
 abstract class MessageManager<Formatting, Server>() {
     abstract var formatting: Formatting
-
     abstract fun sendToMC(message: String, formatting: Formatting)
+    var isShowInOut: Boolean = true
 
     fun sendFormattingMessageToMC(message: String) {
         sendToMC(message, formatting)
@@ -20,6 +20,12 @@ abstract class MessageManager<Formatting, Server>() {
 
     fun sendToGroup(message: String) {
         INSTANCE.send(MessageType.Text(message))
+    }
+
+    fun sendLoginInOut(message: String) {
+        if (isShowInOut) {
+            INSTANCE.send(MessageType.Text(message))
+        }
     }
 
     fun sendHeartbeat() {
