@@ -45,7 +45,7 @@ open class SocketManager : Closeable {
             reconnect(config, "Unable to connect")
         }
     } else {
-        reconnect(config, "Not the first connection")
+        logger.info("MChat server is connected")
     }
 
     fun reconnect(config: Config, errorMessage: String) {
@@ -54,7 +54,7 @@ open class SocketManager : Closeable {
             logger.error("Failed to connect to the server:\"${errorMessage}\", Reconnect after 10 seconds...")
             delay(10000)
             runCatching {
-                close()
+                clean()
                 yield()
                 isConnectable = true
                 connect(config)
@@ -62,7 +62,7 @@ open class SocketManager : Closeable {
         }
     }
 
-    override fun close() {
+    fun clean() {
         if (isConnectable) return
         if (::socket.isInitialized) socket.close()
         if (::reader.isInitialized) reader.close()
@@ -70,6 +70,11 @@ open class SocketManager : Closeable {
         if (::heartbeat.isInitialized) reader.close()
         logger.info("MChatSystem Closed")
         isConnectable = true
+    }
+
+    override fun close() {
+        clean()
+        isConnectable = false
     }
 
     fun send(message: MessageType) {
