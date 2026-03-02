@@ -1,0 +1,16 @@
+[
+{
+  "modid": "mchat",
+  "name": "mchat-forge-1.12.2",
+  "description": "mchat by afeibaili",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["afeibaili"],
+  "credits": "afeibaili",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
