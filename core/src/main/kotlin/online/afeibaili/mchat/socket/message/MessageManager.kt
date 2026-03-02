@@ -35,7 +35,7 @@ abstract class MessageManager<Formatting, Server>() {
     fun parseMessage(message: String) {
         val ident = message.take(4)
         val message: String = message.drop(4)
-        val msg: MessageType? = match(ident, message)
+        match(ident, message)
     }
 
     private fun match(ident: String, message: String) = when (ident) {
@@ -43,7 +43,31 @@ abstract class MessageManager<Formatting, Server>() {
             sendToMC(this.message, formatting)
         }
 
-        "cmd:" -> MessageType.Command(message)
+        "cmd:" -> MessageType.Command(message).apply {
+            when (this.message) {
+                "help", "菜单" -> sendToGroup(
+                    """
+                    菜单
+                    help
+                    close-login-message
+                    关闭登录消息
+                    open-login-message
+                    开启登录消息
+                """.trimIndent()
+                )
+
+                "close-login-message", "关闭登录消息" -> {
+                    isShowInOut = false
+                    sendToGroup("已关闭登录消息")
+                }
+
+                "open-login-message", "开启登录消息" -> {
+                    isShowInOut = true
+                    sendToGroup("已开启登录消息")
+                }
+            }
+        }
+
         "het:" -> MessageType.Heartbeat(message)
         else -> null
     }
