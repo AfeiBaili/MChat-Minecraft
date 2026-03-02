@@ -45,7 +45,7 @@ open class SocketManager : Closeable {
             reconnect(config, "Unable to connect")
         }
     } else {
-        logger.info("MChat server is connected")
+        logger.info("MChat server is connected or closed")
     }
 
     fun reconnect(config: Config, errorMessage: String) {
