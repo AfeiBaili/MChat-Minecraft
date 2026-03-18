@@ -33,6 +33,7 @@ minecraft {
             mods {
                 "${mod_id}" {
                     source sourceSets.main
+                    source project(":core").sourceSets.main
                 }
             }
         }
@@ -72,10 +73,15 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     implementation "thedarkcolour:kotlinforforge:4.11.0"
+    implementation(project(":core"))
 }
 
 compileKotlin {
     kotlinOptions.jvmTarget = "17"
+}
+
+tasks.jar {
+    from(project(":core").sourceSets.main.output)
 }
 
 tasks.named('processResources', ProcessResources).configure {
