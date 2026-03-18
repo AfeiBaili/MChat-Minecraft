@@ -8,9 +8,12 @@ pluginManagement {
         mavenLocal()
         gradlePluginPortal()
         maven { url = uri("https://maven.neoforged.net/releases") }
+        maven { url = uri("https://maven.minecraftforge.net/") }
+        maven { url = uri("https://maven.parchmentmc.org") }
     }
 }
 rootProject.name = "MChatV3"
 
 include(":core")
 include(":neoforge-1.21.1")
+include(":forge-1.20.1")
