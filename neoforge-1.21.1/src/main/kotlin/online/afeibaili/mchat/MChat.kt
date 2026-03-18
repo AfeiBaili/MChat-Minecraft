@@ -27,7 +27,7 @@ object MChat {
         FORGE_BUS.register(this)
         FORGE_BUS.register(Listener())
         ModList.get().getModContainerById(ID)?.get()
-            ?.registerConfig(ModConfig.Type.SERVER, MChatModConfig.spec)
+            ?.registerConfig(ModConfig.Type.COMMON, MChatModConfig.spec)
     }
 
     val mchatSystem: MChatSystem = MChatSystem()

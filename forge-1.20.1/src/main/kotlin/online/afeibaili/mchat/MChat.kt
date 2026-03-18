@@ -28,7 +28,7 @@ class MChat {
     init {
         FORGE_BUS.register(this)
         FORGE_BUS.register(Listener())
-        registerConfig(ModConfig.Type.SERVER, MChatModConfig.spec)
+        registerConfig(ModConfig.Type.COMMON, MChatModConfig.spec)
     }
 
     @SubscribeEvent

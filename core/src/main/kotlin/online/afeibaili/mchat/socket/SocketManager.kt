@@ -41,7 +41,7 @@ open class SocketManager : Closeable {
             heartbeat = Heartbeat({ INSTANCE.getMessageManager().sendHeartbeat() })
             logger.info("MChat server is connected")
         }.onFailure { e ->
-            e.printStackTrace()
+            logger.warn(e.message.toString())
             reconnect(config, "Unable to connect")
         }
     } else {
@@ -64,10 +64,10 @@ open class SocketManager : Closeable {
 
     fun clean() {
         if (isConnectable) return
-        if (::socket.isInitialized) socket.close()
         if (::reader.isInitialized) reader.close()
         if (::writer.isInitialized) writer.close()
-        if (::heartbeat.isInitialized) reader.close()
+        if (::heartbeat.isInitialized) heartbeat.close()
+        if (::socket.isInitialized) socket.close()
         logger.info("MChatSystem Closed")
         isConnectable = true
     }
