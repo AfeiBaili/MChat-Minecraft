@@ -6,9 +6,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent
 import online.afeibaili.mchat.MChat.Companion.mchatSystem
 import online.afeibaili.mchat.listener.MessageListener
 
-class Listener : MessageListener<ServerChatEvent, PlayerEvent.PlayerLoggedInEvent, PlayerEvent.PlayerLoggedOutEvent> {
+class Listener : MessageListener<ServerChatEvent.Submitted, PlayerEvent.PlayerLoggedInEvent, PlayerEvent.PlayerLoggedOutEvent> {
     @SubscribeEvent
-    override fun onMessage(event: ServerChatEvent) {
+    override fun onMessage(event: ServerChatEvent.Submitted) {
         mchatSystem.getMessageManager()
             .sendToGroup("[${ConfigLoader.config.name}] " + event.player.name.string + ": " + event.message.string)
     }
