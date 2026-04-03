@@ -51,7 +51,7 @@ open class SocketManager : Closeable {
     fun reconnect(config: Config, errorMessage: String) {
         reconnectJob?.cancel()
         reconnectJob = reconnectScope.launch {
-            logger.error("Failed to connect to the server:\"${errorMessage}\", Reconnect after 10 seconds...")
+            logger.error("\"${errorMessage}\": Reconnect after 10 seconds...")
             delay(10000)
             runCatching {
                 clean()
@@ -64,15 +64,16 @@ open class SocketManager : Closeable {
 
     fun clean() {
         if (isConnectable) return
+        if (::socket.isInitialized) socket.close()
         if (::reader.isInitialized) reader.close()
         if (::writer.isInitialized) writer.close()
         if (::heartbeat.isInitialized) heartbeat.close()
-        if (::socket.isInitialized) socket.close()
         logger.info("MChatSystem Closed")
         isConnectable = true
     }
 
     override fun close() {
+        reader.isClosed = true
         clean()
         isConnectable = false
     }

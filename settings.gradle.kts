@@ -17,3 +17,4 @@ rootProject.name = "MChatV3"
 include(":core")
 include(":neoforge-1.21.1")
 include(":forge-1.20.1")
+include(":forge-1.19.2")
