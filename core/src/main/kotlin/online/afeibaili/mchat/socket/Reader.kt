@@ -32,9 +32,7 @@ class Reader(
             runCatching {
                 var line: String
                 while (reader.readLine().also { line = it } != null) {
-                    val message: String = cipher.decrypt(line)
-                    action(message)
-                    logger.info(message)
+                    action(cipher.decrypt(line))
                 }
                 throw RuntimeException("MChat server disconnect")
             }.onFailure { exception ->

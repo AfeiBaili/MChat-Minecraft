@@ -1,6 +1,7 @@
 package online.afeibaili.mchat.socket.message
 
 import online.afeibaili.mchat.MChatSystem.Companion.INSTANCE
+import online.afeibaili.mchat.logger.Logger
 
 
 /**
@@ -13,6 +14,7 @@ abstract class MessageManager<Formatting, Server>() {
     abstract var formatting: Formatting
     abstract fun sendToMC(message: String, formatting: Formatting)
     var isShowInOut: Boolean = true
+    private val logger = Logger.getLogger("MChatMessage")
 
     fun sendFormattingMessageToMC(message: String) {
         sendToMC(message, formatting)
@@ -40,6 +42,7 @@ abstract class MessageManager<Formatting, Server>() {
 
     private fun match(ident: String, message: String) = when (ident) {
         "txt:" -> MessageType.Text(message).apply {
+            logger.info(this.message)
             sendToMC(this.message, formatting)
         }
 

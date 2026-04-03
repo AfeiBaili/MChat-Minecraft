@@ -4,16 +4,12 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraftforge.common.ForgeConfigSpec
-import net.minecraftforge.event.ServerChatEvent
-import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.event.server.ServerStartingEvent
 import net.minecraftforge.event.server.ServerStoppingEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.config.ModConfig
-import online.afeibaili.mchat.MChat.Companion.mchatSystem
 import online.afeibaili.mchat.config.Config
-import online.afeibaili.mchat.listener.MessageListener
 import online.afeibaili.mchat.socket.message.MessageManager
 import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 import thedarkcolour.kotlinforforge.forge.registerConfig
@@ -49,26 +45,6 @@ class MChat {
     @SubscribeEvent
     fun onCommonStop(event: ServerStoppingEvent) {
         MChatSystem.close()
-    }
-}
-
-class Listener : MessageListener<ServerChatEvent, PlayerEvent.PlayerLoggedInEvent, PlayerEvent.PlayerLoggedOutEvent> {
-    @SubscribeEvent
-    override fun onMessage(event: ServerChatEvent) {
-        mchatSystem.getMessageManager()
-            .sendToGroup("[${ConfigLoader.config.name}] " + event.player.name.string + ": " + event.message.string)
-    }
-
-    @SubscribeEvent
-    override fun onPlayerIn(event: PlayerEvent.PlayerLoggedInEvent) {
-        mchatSystem.getMessageManager()
-            .sendLoginInOut("${event.entity.name.string}加入了${ConfigLoader.config.name}服务器")
-    }
-
-    @SubscribeEvent
-    override fun onPlayerOut(event: PlayerEvent.PlayerLoggedOutEvent) {
-        mchatSystem.getMessageManager()
-            .sendLoginInOut("${event.entity.name.string}退出了${ConfigLoader.config.name}服务器")
     }
 }
 
