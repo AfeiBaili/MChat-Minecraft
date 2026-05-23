@@ -16,4 +16,5 @@ sealed class MessageType(val identifier: String) {
     class Text(override val message: String) : MessageType("txt")
     class Command(override val message: String) : MessageType("cmd")
     class Heartbeat(override val message: String) : MessageType("het")
+    class Image(override val message: String) : MessageType("img")
 }

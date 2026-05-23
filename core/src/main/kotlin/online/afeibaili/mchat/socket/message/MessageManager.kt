@@ -13,6 +13,7 @@ import online.afeibaili.mchat.logger.Logger
 abstract class MessageManager<Formatting, Server>() {
     abstract var formatting: Formatting
     abstract fun sendToMC(message: String, formatting: Formatting)
+    abstract fun sendImageToMC(message: String, formatting: Formatting)
     var isShowInOut: Boolean = true
     private val logger = Logger.getLogger("MChatMessage")
 
@@ -72,6 +73,13 @@ abstract class MessageManager<Formatting, Server>() {
         }
 
         "het:" -> MessageType.Heartbeat(message)
+
+        "img:" -> {
+            MessageType.Image(message).apply {
+                logger.info(this.message)
+                sendImageToMC(this.message, formatting)
+            }
+        }
         else -> null
     }
 }

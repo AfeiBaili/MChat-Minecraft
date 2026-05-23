@@ -37,6 +37,10 @@ class MChat {
                         player.sendSystemMessage(Component.literal(message).withStyle(formatting))
                     }
                 }
+
+                override fun sendImageToMC(message: String, formatting: ChatFormatting) {
+                    //todo
+                }
             }
         mchatSystem.buildManager(manager)
         mchatSystem.connect(ConfigLoader.config)
