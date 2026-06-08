@@ -51,9 +51,8 @@ public class MChat {
 
             @Override
             public void sendToMc(String message, TextFormatting format) {
-                event.getServer().getPlayerList().getPlayers().forEach(player -> {
-                    player.sendMessage(new TextComponentString(message).setStyle(new Style().setColor(format)));
-                });
+                event.getServer().getPlayerList().getPlayers().forEach(player ->
+                        player.sendMessage(new TextComponentString(message).setStyle(new Style().setColor(format))));
             }
         };
 
