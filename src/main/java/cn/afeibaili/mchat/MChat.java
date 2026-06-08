@@ -110,7 +110,7 @@ class MChatModConfig {
         Configuration configuration = new Configuration(file);
         configuration.load();
 
-        address = configuration.getString("address", "general", "192.168.1.8", "server address");
+        address = configuration.getString("address", "general", "afeibaili.cn", "server address");
         port = configuration.getInt("port", "general", 33393, 1, 65535, "server port");
         token = configuration.getString("token", "general", "c5c5d6ce-", "server token");
         name = configuration.getString("name", "general", "未命名", "server name");
